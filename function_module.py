@@ -6,6 +6,8 @@ def calculate_age(birthday):
     today = datetime.now()
     birthday = datetime.strptime(birthday, "%Y-%m-%d")
     age = today.year - birthday.year
+    if(today.month, today.day) < (birthday.month, birthday.day):
+        age -=1
     return age
 
 #환율 변환 함수
@@ -24,11 +26,11 @@ tools = [{
     #나이 계산
     'type': 'function',
     'name': 'calculate_age',
-    'description': '생일을 입력받아 현재 나이를 계산한다.',
+    'description': '생일(YYYY-MM-DD)을 입력받아 현재 나이를 계산한다.',
     'parameters':{
         'type': 'object',
         'properties': {
-            'birthday': {'type': 'string'}
+            'birthday': {'type': 'string', "description": "생년월일, 형식:YYYY-MM-DD"}
         },
         'required': ['birthday'],
         'additionalProperties': False
@@ -43,7 +45,7 @@ tools = [{
     'parameters':{
         'type': 'object',
         'properties': {
-            'amount': {'type': 'number'}
+            'amount': {'type': 'number',"description": "달러(USD) 금액"}
         },
         'required': ['amount'],
         'additionalProperties': False
@@ -59,8 +61,8 @@ tools = [{
     'parameters':{
         'type': 'object',
         'properties': {
-            'height': {'type': 'number'},
-            'weight': {'type': 'number'}
+            'height': {'type': 'number',"description": "키(cm)"},
+            'weight': {'type': 'number',"description": "몸무게(kg)"}
         },
         'required': ['height','weight'],
         'additionalProperties': False
