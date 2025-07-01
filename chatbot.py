@@ -13,12 +13,27 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
+#성격 프롬프트 정의
+personality_prompts = {
+    "유쾌한 친구": "너는 밝고 에너지 넘치며, 이모지를 자주 사용하고 친구처럼 말하는 캐릭터야.",
+    "신사적인 조언가": "너는 정중하고 이성적인 어조로 조심스럽게 조언을 주는 조언자야.",
+    "냉혹한 비판가": "너는 냉정한 시선으로 분석하며, 비판도 서슴치 않지만 필요한 조언을 해주는 비판가야.",
+}
+
+
+# 성격 선택
+persona = st.selectbox("챗봇의 성격을 골라주세요!", list(personality_prompts.keys()))
+
 
 st.sidebar.title('메뉴')
 page = st.sidebar.selectbox('페이지를 선택하세요', ['챗봇', '순위'])
 
 if page == '챗봇':
     st.title('ChatGPT 국산')
+    character_prompt = personality_prompts[persona]   #지정된 봇의 성격
+    messages = [{"role": "system", "content": character_prompt}]
+
+
     #세션 관리 객체. 세션에 키-값 형식으로 데이터를 저장하는 변수
     #openai_model 저장 --> str, message(사용자가 요청한 메시지)--> []
     if 'openai_model' not in st.session_state :
@@ -27,7 +42,15 @@ if page == '챗봇':
 
     if 'messages' not in st.session_state:
         #message 키 없으면 추가 및 초기화
-        st.session_state.messages = []
+        st.session_state.messages = [{"role": "system", "content": character_prompt}]   #성격 반영하기
+    #성격 변경 시 message 초기화
+    if 'last_persona' not in st.session_state:
+        st.session_state.last_persona = persona
+
+    if persona != st.session_state.last_persona:
+        st.session_state.last_persona = persona
+        st.session_state.messages = [
+            {"role": "system", "content": personality_prompts[persona]}]
 
     #기존의 메시지가 있다면 출력
     for msg in st.session_state.messages:
